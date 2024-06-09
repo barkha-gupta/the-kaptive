@@ -35,7 +35,7 @@ const StyledMenu = styled((props) => (
   "& .MuiPaper-root": {
     borderRadius: 6,
     marginTop: theme.spacing(0.5),
-    minWidth: 150,
+    minWidth: 180,
     boxShadow:
       "rgb(255, 255, 255) 0px 0px 0px 0px, rgba(0, 0, 0, 0.05) 0px 0px 0px 1px, rgba(0, 0, 0, 0.1) 0px 10px 15px -3px, rgba(0, 0, 0, 0.05) 0px 4px 6px -2px",
     "& .MuiMenu-list": {
@@ -56,9 +56,7 @@ const FinancialSummaryTable = () => {
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
 
-  const [currency, setCurrency] = useState(
-    localStorage.getItem("currency") | "USD"
-  );
+  const [currency, setCurrency] = useState("USD");
 
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -66,20 +64,21 @@ const FinancialSummaryTable = () => {
   const handleClose = (selectedcurrency) => {
     if (selectedcurrency) {
       setCurrency(selectedcurrency); //setting the currency
-      localStorage.setItem("currency", selectedcurrency); //storing it in localstorage for better ux
     }
     setAnchorEl(null);
   };
 
-  useEffect(() => {
-    //when currency is changed
-    //convert the amount
-    console.log(currency);
-  }, [currency]);
-
-  //   const convertValue = (value, currency)=>{
-  //     if()
-  //   }
+  const convertValue = (value, currency) => {
+    switch (currency) {
+      case "EUR":
+        return (value * 0.85).toFixed(2); // Rounding to 2 decimal places
+      case "GBP":
+        return (value * 0.75).toFixed(2);
+      case "USD":
+      default:
+        return value.toFixed(2);
+    }
+  };
 
   const columnData = [
     "Cashflow",
@@ -101,41 +100,43 @@ const FinancialSummaryTable = () => {
     <div className="container">
       <header>
         <h2>Financial Summary Table</h2>
-        <div>
-          <Button
-            id="menu-button"
-            aria-controls={open ? "currency-menu" : undefined}
-            aria-haspopup="true"
-            aria-expanded={open ? "true" : undefined}
-            variant="contained"
-            disableElevation
-            onClick={handleClick}
-            endIcon={<KeyboardArrowDownIcon />}
-          >
-            Currency
-          </Button>
-          <StyledMenu
-            id="currency-menu"
-            MenuListProps={{
-              "aria-labelledby": "menu-button",
-            }}
-            anchorEl={anchorEl}
-            open={open}
-            onClose={() => handleClose(null)}
-          >
-            <MenuItem onClick={() => handleClose("USD")} disableRipple>
-              <AttachMoneyIcon />
-              USD
-            </MenuItem>
-            <MenuItem onClick={() => handleClose("EUR")} disableRipple>
-              <EuroIcon />
-              EUR
-            </MenuItem>
-            <MenuItem onClick={() => handleClose("GBP")} disableRipple>
-              <CurrencyPoundIcon />
-              GBP
-            </MenuItem>
-          </StyledMenu>
+        <div className="actions">
+          <div>
+            <Button
+              id="menu-button"
+              aria-controls={open ? "currency-menu" : undefined}
+              aria-haspopup="true"
+              aria-expanded={open ? "true" : undefined}
+              variant="contained"
+              disableElevation
+              onClick={handleClick}
+              endIcon={<KeyboardArrowDownIcon />}
+            >
+              Currency: {currency}
+            </Button>
+            <StyledMenu
+              id="currency-menu"
+              MenuListProps={{
+                "aria-labelledby": "menu-button",
+              }}
+              anchorEl={anchorEl}
+              open={open}
+              onClose={() => handleClose(null)}
+            >
+              <MenuItem onClick={() => handleClose("USD")} disableRipple>
+                <AttachMoneyIcon />
+                USD
+              </MenuItem>
+              <MenuItem onClick={() => handleClose("EUR")} disableRipple>
+                <EuroIcon />
+                EUR
+              </MenuItem>
+              <MenuItem onClick={() => handleClose("GBP")} disableRipple>
+                <CurrencyPoundIcon />
+                GBP
+              </MenuItem>
+            </StyledMenu>
+          </div>
         </div>
       </header>
 
@@ -200,7 +201,7 @@ const FinancialSummaryTable = () => {
                       backgroundColor: i % 2 === 0 ? "#f9f9f9" : "inherit",
                     }}
                   >
-                    {row[month].toFixed(2)}
+                    {convertValue(row[month], currency)}
                   </TableCell>
                 ))}
               </TableRow>
