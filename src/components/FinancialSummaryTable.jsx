@@ -12,7 +12,7 @@ import { styled } from "@mui/material/styles";
 import Button from "@mui/material/Button";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
-import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
+import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import PrintIcon from "@mui/icons-material/Print";
 
 import InputLabel from "@mui/material/InputLabel";
@@ -164,12 +164,18 @@ const FinancialSummaryTable = () => {
               aria-expanded={open ? "true" : undefined}
               disableElevation
               onClick={handleClick}
-              endIcon={<KeyboardArrowDownIcon />}
+              endIcon={<ArrowDropDownIcon />}
               sx={{
                 maxWidth: 120,
                 backgroundColor: "white",
                 color: "#8a8d92",
                 border: "0.5px solid #e9edf8",
+                ":hover": {
+                  border: "0.4px solid black",
+                },
+                ":active": {
+                  border: "2px solid #1976d2",
+                },
               }}
             >
               Currency
@@ -206,6 +212,12 @@ const FinancialSummaryTable = () => {
                 backgroundColor: "white",
                 color: "#8a8d92",
                 border: "0.5px solid #e9edf8",
+                ":hover": {
+                  border: "0.4px solid black",
+                },
+                ":active": {
+                  border: "2px solid #1976d2",
+                },
               }}
               onClick={handlePrint}
             >
@@ -219,7 +231,7 @@ const FinancialSummaryTable = () => {
         <TableContainer
           sx={{
             maxWidth: "100%",
-            maxHeight: "calc(100vh - 250px)",
+            maxHeight: "calc(100vh - 50px)",
             "&::-webkit-scrollbar": {
               display: "none",
               "@media print": {
@@ -235,7 +247,11 @@ const FinancialSummaryTable = () => {
             <TableHead>
               <TableRow>
                 <TableCell>
-                  <DragIndicatorIcon />
+                  <DragIndicatorIcon
+                    sx={{
+                      color: "lightgray",
+                    }}
+                  />
                 </TableCell>
                 {columnData.map((colName, i) => (
                   <TableCell
@@ -278,7 +294,10 @@ const FinancialSummaryTable = () => {
                           className={snapshot.isDragging ? "dragactive" : ""}
                         >
                           <TableCell {...provided.dragHandleProps}>
-                            <DragIndicatorIcon />
+                            <DragIndicatorIcon
+                              sx={{ color: "gray" }}
+                              className="drag-handle"
+                            />
                           </TableCell>
                           <TableCell
                             sx={{
