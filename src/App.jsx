@@ -3,9 +3,11 @@ import FinancialSummaryTable from "./components/FinancialSummaryTable";
 
 function App() {
   return (
-    <>
-      <FinancialSummaryTable />
-    </>
+    <div>
+      <div className="table-container">
+        <FinancialSummaryTable />
+      </div>
+    </div>
   );
 }
 export default App;

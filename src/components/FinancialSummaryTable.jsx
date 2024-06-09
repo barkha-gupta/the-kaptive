@@ -28,14 +28,39 @@ const FinancialSummaryTable = () => {
   ];
 
   return (
-    <div>
-      <h2>Financial Summary Table</h2>
-      <TableContainer component={Paper}>
-        <Table>
+    <div className="container">
+      <header>
+        <h2>Financial Summary Table</h2>
+      </header>
+      <TableContainer
+        sx={{
+          maxWidth: "1235px",
+          maxHeight: "565px",
+          overflow: "auto",
+          "&::-webkit-scrollbar": {
+            display: "none",
+          },
+        }}
+        component={Paper}
+      >
+        <Table stickyHeader>
           <TableHead>
             <TableRow>
               {columnData.map((colName, i) => (
-                <TableCell key={i}>{colName}</TableCell>
+                <TableCell
+                  sx={{
+                    backgroundColor: "#d2ddf3",
+                    color: "#1e1f91",
+                    fontWeight: "700",
+                    borderTop: "0.5px solid #e9edf8",
+                    borderBottom: "0.5px solid #e9edf8",
+                    borderLeft: "none",
+                    borderRight: "none",
+                  }}
+                  key={i}
+                >
+                  {colName}
+                </TableCell>
               ))}
             </TableRow>
           </TableHead>
@@ -43,19 +68,34 @@ const FinancialSummaryTable = () => {
           <TableBody>
             {tableData.map((row, index) => (
               <TableRow key={index}>
-                <TableCell>{row.Overhead}</TableCell>
-                <TableCell align="right">{row.Jan.toFixed(2)}</TableCell>
-                <TableCell align="right">{row.Feb.toFixed(2)}</TableCell>
-                <TableCell align="right">{row.March.toFixed(2)}</TableCell>
-                <TableCell align="right">{row.April.toFixed(2)}</TableCell>
-                <TableCell align="right">{row.May.toFixed(2)}</TableCell>
-                <TableCell align="right">{row.June.toFixed(2)}</TableCell>
-                <TableCell align="right">{row.July.toFixed(2)}</TableCell>
-                <TableCell align="right">{row.August.toFixed(2)}</TableCell>
-                <TableCell align="right">{row.September.toFixed(2)}</TableCell>
-                <TableCell align="right">{row.October.toFixed(2)}</TableCell>
-                <TableCell align="right">{row.November.toFixed(2)}</TableCell>
-                <TableCell align="right">{row.December.toFixed(2)}</TableCell>
+                <TableCell sx={{ minWidth: "180px", fontWeight: 600 }}>
+                  {row.Overhead}
+                </TableCell>
+                {[
+                  "Jan",
+                  "Feb",
+                  "March",
+                  "April",
+                  "May",
+                  "June",
+                  "July",
+                  "August",
+                  "September",
+                  "October",
+                  "November",
+                  "December",
+                ].map((month, i) => (
+                  <TableCell
+                    key={month}
+                    sx={{
+                      border: "1px solid ##f1f1f1",
+                      minWidth: "150px",
+                      backgroundColor: i % 2 === 0 ? "#f9f9f9" : "inherit",
+                    }}
+                  >
+                    {row[month].toFixed(2)}
+                  </TableCell>
+                ))}
               </TableRow>
             ))}
           </TableBody>

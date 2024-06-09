@@ -1,0 +1,9 @@
+.container {
+  padding: 20px 30px;
+  border: 1px solid black;
+  margin: 10px;
+}
+header {
+  padding-bottom: 20px;
+  letter-spacing: -0.1rem;
+}
