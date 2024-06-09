@@ -231,7 +231,7 @@ const FinancialSummaryTable = () => {
         <TableContainer
           sx={{
             maxWidth: "100%",
-            maxHeight: "calc(100vh - 50px)",
+            maxHeight: "calc(100vh - 120px)",
             "&::-webkit-scrollbar": {
               display: "none",
               "@media print": {
