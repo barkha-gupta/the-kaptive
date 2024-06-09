@@ -8,8 +8,78 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 
+import { styled } from "@mui/material/styles";
+import Button from "@mui/material/Button";
+import Menu from "@mui/material/Menu";
+import MenuItem from "@mui/material/MenuItem";
+import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
+
+import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
+import EuroIcon from "@mui/icons-material/Euro";
+import CurrencyPoundIcon from "@mui/icons-material/CurrencyPound";
+
+const StyledMenu = styled((props) => (
+  <Menu
+    elevation={0}
+    anchorOrigin={{
+      vertical: "bottom",
+      horizontal: "right",
+    }}
+    transformOrigin={{
+      vertical: "top",
+      horizontal: "right",
+    }}
+    {...props}
+  />
+))(({ theme }) => ({
+  "& .MuiPaper-root": {
+    borderRadius: 6,
+    marginTop: theme.spacing(0.5),
+    minWidth: 150,
+    boxShadow:
+      "rgb(255, 255, 255) 0px 0px 0px 0px, rgba(0, 0, 0, 0.05) 0px 0px 0px 1px, rgba(0, 0, 0, 0.1) 0px 10px 15px -3px, rgba(0, 0, 0, 0.05) 0px 4px 6px -2px",
+    "& .MuiMenu-list": {
+      padding: "5px 0",
+    },
+    "& .MuiMenuItem-root": {
+      "& .MuiSvgIcon-root": {
+        fontSize: 15,
+        color: theme.palette.text.secondary,
+        marginRight: theme.spacing(1.5),
+      },
+    },
+  },
+}));
+
 const FinancialSummaryTable = () => {
   const [tableData, setTableData] = useState(data.Sheet1);
+  const [anchorEl, setAnchorEl] = useState(null);
+  const open = Boolean(anchorEl);
+
+  const [currency, setCurrency] = useState(
+    localStorage.getItem("currency") | "USD"
+  );
+
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+  const handleClose = (selectedcurrency) => {
+    if (selectedcurrency) {
+      setCurrency(selectedcurrency); //setting the currency
+      localStorage.setItem("currency", selectedcurrency); //storing it in localstorage for better ux
+    }
+    setAnchorEl(null);
+  };
+
+  useEffect(() => {
+    //when currency is changed
+    //convert the amount
+    console.log(currency);
+  }, [currency]);
+
+  //   const convertValue = (value, currency)=>{
+  //     if()
+  //   }
 
   const columnData = [
     "Cashflow",
@@ -31,7 +101,44 @@ const FinancialSummaryTable = () => {
     <div className="container">
       <header>
         <h2>Financial Summary Table</h2>
+        <div>
+          <Button
+            id="menu-button"
+            aria-controls={open ? "currency-menu" : undefined}
+            aria-haspopup="true"
+            aria-expanded={open ? "true" : undefined}
+            variant="contained"
+            disableElevation
+            onClick={handleClick}
+            endIcon={<KeyboardArrowDownIcon />}
+          >
+            Currency
+          </Button>
+          <StyledMenu
+            id="currency-menu"
+            MenuListProps={{
+              "aria-labelledby": "menu-button",
+            }}
+            anchorEl={anchorEl}
+            open={open}
+            onClose={() => handleClose(null)}
+          >
+            <MenuItem onClick={() => handleClose("USD")} disableRipple>
+              <AttachMoneyIcon />
+              USD
+            </MenuItem>
+            <MenuItem onClick={() => handleClose("EUR")} disableRipple>
+              <EuroIcon />
+              EUR
+            </MenuItem>
+            <MenuItem onClick={() => handleClose("GBP")} disableRipple>
+              <CurrencyPoundIcon />
+              GBP
+            </MenuItem>
+          </StyledMenu>
+        </div>
       </header>
+
       <TableContainer
         sx={{
           maxWidth: "1235px",
