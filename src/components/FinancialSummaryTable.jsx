@@ -27,6 +27,7 @@ import CurrencyPoundIcon from "@mui/icons-material/CurrencyPound";
 import DragIndicatorIcon from "@mui/icons-material/DragIndicator";
 
 import { useReactToPrint } from "react-to-print";
+import { columnData, convertValue } from "../utils";
 
 const StyledMenu = styled((props) => (
   <Menu
@@ -71,6 +72,7 @@ const FinancialSummaryTable = () => {
 
   const componentRef = useRef();
 
+  //for handling currency menu
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
@@ -81,28 +83,20 @@ const FinancialSummaryTable = () => {
     setAnchorEl(null);
   };
 
+  //for handling demimal menu
+
   const handleDecimalChange = (event) => {
     setDecimalValue(event.target.value);
   };
 
-  const convertValue = (value, currency) => {
-    switch (currency) {
-      case "EUR":
-        return value * 0.85;
-      case "GBP":
-        return value * 0.75;
-      case "USD":
-      default:
-        return value;
-    }
-  };
-
+  //for handling print functionality
   const handlePrint = useReactToPrint({
     content: () => componentRef.current,
     onAfterPrint: () => console.log("Print successful!"),
     onPrintError: (error) => console.log(`Print error: ${error}`),
   });
 
+  //for draggable rows
   const handleDragEnd = (result) => {
     if (!result.destination) {
       return;
@@ -114,22 +108,6 @@ const FinancialSummaryTable = () => {
 
     setTableData(items);
   };
-
-  const columnData = [
-    "Cashflow",
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December",
-  ];
 
   return (
     <div className="container">
