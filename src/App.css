@@ -14,3 +14,7 @@ header {
   display: flex;
   column-gap: 1rem;
 }
+.dragactive {
+  background-color: #b888dc;
+  border: "none";
+}

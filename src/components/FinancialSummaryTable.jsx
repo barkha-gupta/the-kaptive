@@ -19,9 +19,12 @@ import InputLabel from "@mui/material/InputLabel";
 import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
 
+import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
+
 import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
 import EuroIcon from "@mui/icons-material/Euro";
 import CurrencyPoundIcon from "@mui/icons-material/CurrencyPound";
+import DragIndicatorIcon from "@mui/icons-material/DragIndicator";
 
 import { useReactToPrint } from "react-to-print";
 
@@ -96,9 +99,21 @@ const FinancialSummaryTable = () => {
 
   const handlePrint = useReactToPrint({
     content: () => componentRef.current,
-    onAfterPrint: () => alert("Print successful!"),
-    onPrintError: (error) => alert(`Print error: ${error}`),
+    onAfterPrint: () => console.log("Print successful!"),
+    onPrintError: (error) => console.log(`Print error: ${error}`),
   });
+
+  const handleDragEnd = (result) => {
+    if (!result.destination) {
+      return;
+    }
+
+    const items = Array.from(tableData);
+    const [selectedRow] = items.splice(result.source.index, 1); //removing the selected item
+    items.splice(result.destination.index, 0, selectedRow); //adding the selected item
+
+    setTableData(items);
+  };
 
   const columnData = [
     "Cashflow",
@@ -200,85 +215,119 @@ const FinancialSummaryTable = () => {
         </div>
       </header>
 
-      <TableContainer
-        sx={{
-          maxWidth: "100%",
-          maxHeight: "calc(100vh - 250px)",
-          "&::-webkit-scrollbar": {
-            display: "none",
-            "@media print": {
-              maxWidth: "210mm",
-              maxHeight: "290mm",
-              margin: "20px",
+      <DragDropContext onDragEnd={(result) => handleDragEnd(result)}>
+        <TableContainer
+          sx={{
+            maxWidth: "100%",
+            maxHeight: "calc(100vh - 250px)",
+            "&::-webkit-scrollbar": {
+              display: "none",
+              "@media print": {
+                maxWidth: "210mm",
+                maxHeight: "290mm",
+                margin: "20px",
+              },
             },
-          },
-        }}
-        component={Paper}
-      >
-        <Table stickyHeader ref={componentRef}>
-          <TableHead>
-            <TableRow>
-              {columnData.map((colName, i) => (
-                <TableCell
-                  sx={{
-                    backgroundColor: "#d2ddf3",
-                    color: "#1e1f91",
-                    fontWeight: "700",
-                    borderTop: "0.5px solid #e9edf8",
-                    borderBottom: "0.5px solid #e9edf8",
-                    borderLeft: "none",
-                    borderRight: "none",
-                  }}
-                  key={i}
-                >
-                  {colName}
+          }}
+          component={Paper}
+        >
+          <Table stickyHeader ref={componentRef}>
+            <TableHead>
+              <TableRow>
+                <TableCell>
+                  <DragIndicatorIcon />
                 </TableCell>
-              ))}
-            </TableRow>
-          </TableHead>
-
-          <TableBody>
-            {tableData.map((row, index) => (
-              <TableRow key={index}>
-                <TableCell
-                  sx={{
-                    fontWeight: 600,
-                  }}
-                >
-                  {row.Overhead}
-                </TableCell>
-                {[
-                  "Jan",
-                  "Feb",
-                  "March",
-                  "April",
-                  "May",
-                  "June",
-                  "July",
-                  "August",
-                  "September",
-                  "October",
-                  "November",
-                  "December",
-                ].map((month, i) => (
+                {columnData.map((colName, i) => (
                   <TableCell
-                    key={month}
                     sx={{
-                      border: "1px solid ##f1f1f1",
-                      backgroundColor: i % 2 === 0 ? "#f9f9f9" : "inherit",
-                      "@media print": {
-                        fontSize: "0.8rem",
-                      },
+                      backgroundColor: "#d2ddf3",
+                      color: "#1e1f91",
+                      fontWeight: "700",
+                      borderTop: "0.5px solid #e9edf8",
+                      borderBottom: "0.5px solid #e9edf8",
+                      borderLeft: "none",
+                      borderRight: "none",
                     }}
+                    key={i}
                   >
-                    {convertValue(row[month], currency).toFixed(decimalValue)}
+                    {colName}
                   </TableCell>
                 ))}
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+            </TableHead>
+
+            <Droppable
+              droppableId="rows"
+              type="ROW"
+              direction="horizontal"
+              ignoreContainerClipping={true}
+            >
+              {(provided) => (
+                <TableBody ref={provided.innerRef} {...provided.droppableProps}>
+                  {tableData.map((row, index) => (
+                    <Draggable
+                      key={index}
+                      draggableId={`row-${index}`}
+                      index={index}
+                    >
+                      {(provided, snapshot) => (
+                        <TableRow
+                          key={index}
+                          ref={provided.innerRef}
+                          {...provided.draggableProps}
+                          className={snapshot.isDragging ? "dragactive" : ""}
+                        >
+                          <TableCell {...provided.dragHandleProps}>
+                            <DragIndicatorIcon />
+                          </TableCell>
+                          <TableCell
+                            sx={{
+                              fontWeight: 600,
+                            }}
+                          >
+                            {row.Overhead}
+                          </TableCell>
+                          {[
+                            "Jan",
+                            "Feb",
+                            "March",
+                            "April",
+                            "May",
+                            "June",
+                            "July",
+                            "August",
+                            "September",
+                            "October",
+                            "November",
+                            "December",
+                          ].map((month, i) => (
+                            <TableCell
+                              key={month}
+                              sx={{
+                                border: "1px solid ##f1f1f1",
+                                backgroundColor:
+                                  i % 2 === 0 ? "#f9f9f9" : "inherit",
+                                "@media print": {
+                                  fontSize: "0.8rem",
+                                },
+                              }}
+                            >
+                              {convertValue(row[month], currency).toFixed(
+                                decimalValue
+                              )}
+                            </TableCell>
+                          ))}
+                        </TableRow>
+                      )}
+                    </Draggable>
+                  ))}
+                  {provided.placeholder}
+                </TableBody>
+              )}
+            </Droppable>
+          </Table>
+        </TableContainer>
+      </DragDropContext>
     </div>
   );
 };
