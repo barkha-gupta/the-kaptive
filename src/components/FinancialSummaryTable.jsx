@@ -8,11 +8,15 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 
-import { styled } from "@mui/material/styles";
+import { styled, alpha } from "@mui/material/styles";
 import Button from "@mui/material/Button";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
+
+import InputLabel from "@mui/material/InputLabel";
+import FormControl from "@mui/material/FormControl";
+import Select from "@mui/material/Select";
 
 import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
 import EuroIcon from "@mui/icons-material/Euro";
@@ -47,6 +51,12 @@ const StyledMenu = styled((props) => (
         color: theme.palette.text.secondary,
         marginRight: theme.spacing(1.5),
       },
+      //   "&:active": {
+      //     backgroundColor: alpha(
+      //       theme.palette.primary.main,
+      //       theme.palette.action.selectedOpacity
+      //     )
+      //   },
     },
   },
 }));
@@ -57,6 +67,7 @@ const FinancialSummaryTable = () => {
   const open = Boolean(anchorEl);
 
   const [currency, setCurrency] = useState("USD");
+  const [decimalValue, setDecimalValue] = useState(2);
 
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -68,15 +79,19 @@ const FinancialSummaryTable = () => {
     setAnchorEl(null);
   };
 
+  const handleDecimalChange = (event) => {
+    setDecimalValue(event.target.value);
+  };
+
   const convertValue = (value, currency) => {
     switch (currency) {
       case "EUR":
-        return (value * 0.85).toFixed(2); // Rounding to 2 decimal places
+        return value * 0.85;
       case "GBP":
-        return (value * 0.75).toFixed(2);
+        return value * 0.75;
       case "USD":
       default:
-        return value.toFixed(2);
+        return value;
     }
   };
 
@@ -102,15 +117,39 @@ const FinancialSummaryTable = () => {
         <h2>Financial Summary Table</h2>
         <div className="actions">
           <div>
+            <FormControl sx={{ minWidth: 120 }} size="small">
+              <InputLabel sx={{ color: "#8a8d92" }} id="decimal">
+                Decimal Value
+              </InputLabel>
+              <Select
+                labelId="decimal"
+                id="select-small"
+                value={decimalValue}
+                label="Decimal Value"
+                onChange={handleDecimalChange}
+                sx={{ color: "#8a8d92" }}
+              >
+                <MenuItem value={0}>Zero</MenuItem>
+                <MenuItem value={1}>One</MenuItem>
+                <MenuItem value={2}>Two</MenuItem>
+              </Select>
+            </FormControl>
+          </div>
+
+          <div>
             <Button
               id="menu-button"
               aria-controls={open ? "currency-menu" : undefined}
               aria-haspopup="true"
               aria-expanded={open ? "true" : undefined}
-              variant="contained"
               disableElevation
               onClick={handleClick}
               endIcon={<KeyboardArrowDownIcon />}
+              sx={{
+                backgroundColor: "white",
+                color: "#8a8d92",
+                border: "0.5px solid #e9edf8",
+              }}
             >
               Currency: {currency}
             </Button>
@@ -201,7 +240,7 @@ const FinancialSummaryTable = () => {
                       backgroundColor: i % 2 === 0 ? "#f9f9f9" : "inherit",
                     }}
                   >
-                    {convertValue(row[month], currency)}
+                    {convertValue(row[month], currency).toFixed(decimalValue)}
                   </TableCell>
                 ))}
               </TableRow>
