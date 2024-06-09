@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useRef } from "react";
 import data from "../data/tableData.json";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
@@ -8,11 +8,12 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 
-import { styled, alpha } from "@mui/material/styles";
+import { styled } from "@mui/material/styles";
 import Button from "@mui/material/Button";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
+import PrintIcon from "@mui/icons-material/Print";
 
 import InputLabel from "@mui/material/InputLabel";
 import FormControl from "@mui/material/FormControl";
@@ -21,6 +22,8 @@ import Select from "@mui/material/Select";
 import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
 import EuroIcon from "@mui/icons-material/Euro";
 import CurrencyPoundIcon from "@mui/icons-material/CurrencyPound";
+
+import { useReactToPrint } from "react-to-print";
 
 const StyledMenu = styled((props) => (
   <Menu
@@ -51,12 +54,6 @@ const StyledMenu = styled((props) => (
         color: theme.palette.text.secondary,
         marginRight: theme.spacing(1.5),
       },
-      //   "&:active": {
-      //     backgroundColor: alpha(
-      //       theme.palette.primary.main,
-      //       theme.palette.action.selectedOpacity
-      //     )
-      //   },
     },
   },
 }));
@@ -68,6 +65,8 @@ const FinancialSummaryTable = () => {
 
   const [currency, setCurrency] = useState("USD");
   const [decimalValue, setDecimalValue] = useState(2);
+
+  const componentRef = useRef();
 
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -94,6 +93,12 @@ const FinancialSummaryTable = () => {
         return value;
     }
   };
+
+  const handlePrint = useReactToPrint({
+    content: () => componentRef.current,
+    onAfterPrint: () => alert("Print successful!"),
+    onPrintError: (error) => alert(`Print error: ${error}`),
+  });
 
   const columnData = [
     "Cashflow",
@@ -129,9 +134,9 @@ const FinancialSummaryTable = () => {
                 onChange={handleDecimalChange}
                 sx={{ color: "#8a8d92" }}
               >
-                <MenuItem value={0}>Zero</MenuItem>
-                <MenuItem value={1}>One</MenuItem>
-                <MenuItem value={2}>Two</MenuItem>
+                <MenuItem value={0}>ZERO</MenuItem>
+                <MenuItem value={1}>ONE</MenuItem>
+                <MenuItem value={2}>TWO</MenuItem>
               </Select>
             </FormControl>
           </div>
@@ -146,12 +151,13 @@ const FinancialSummaryTable = () => {
               onClick={handleClick}
               endIcon={<KeyboardArrowDownIcon />}
               sx={{
+                maxWidth: 120,
                 backgroundColor: "white",
                 color: "#8a8d92",
                 border: "0.5px solid #e9edf8",
               }}
             >
-              Currency: {currency}
+              Currency
             </Button>
             <StyledMenu
               id="currency-menu"
@@ -176,21 +182,40 @@ const FinancialSummaryTable = () => {
               </MenuItem>
             </StyledMenu>
           </div>
+
+          <div>
+            <Button
+              endIcon={<PrintIcon />}
+              sx={{
+                maxWidth: 120,
+                backgroundColor: "white",
+                color: "#8a8d92",
+                border: "0.5px solid #e9edf8",
+              }}
+              onClick={handlePrint}
+            >
+              Print
+            </Button>
+          </div>
         </div>
       </header>
 
       <TableContainer
         sx={{
-          maxWidth: "1235px",
-          maxHeight: "565px",
-          overflow: "auto",
+          maxWidth: "100%",
+          maxHeight: "calc(100vh - 250px)",
           "&::-webkit-scrollbar": {
             display: "none",
+            "@media print": {
+              maxWidth: "210mm",
+              maxHeight: "290mm",
+              margin: "20px",
+            },
           },
         }}
         component={Paper}
       >
-        <Table stickyHeader>
+        <Table stickyHeader ref={componentRef}>
           <TableHead>
             <TableRow>
               {columnData.map((colName, i) => (
@@ -215,7 +240,11 @@ const FinancialSummaryTable = () => {
           <TableBody>
             {tableData.map((row, index) => (
               <TableRow key={index}>
-                <TableCell sx={{ minWidth: "180px", fontWeight: 600 }}>
+                <TableCell
+                  sx={{
+                    fontWeight: 600,
+                  }}
+                >
                   {row.Overhead}
                 </TableCell>
                 {[
@@ -236,8 +265,10 @@ const FinancialSummaryTable = () => {
                     key={month}
                     sx={{
                       border: "1px solid ##f1f1f1",
-                      minWidth: "150px",
                       backgroundColor: i % 2 === 0 ? "#f9f9f9" : "inherit",
+                      "@media print": {
+                        fontSize: "0.8rem",
+                      },
                     }}
                   >
                     {convertValue(row[month], currency).toFixed(decimalValue)}
